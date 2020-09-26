@@ -118,7 +118,7 @@ public:
 
 	}
 
-	//get the point's geoXYZ with image x y
+	//get the point's geoZ with image x y
 	/*
 	@prama: poDataset -- GDAL dataset to file
 	@prama: inBuf -- GDAL reader

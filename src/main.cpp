@@ -5,26 +5,22 @@
 int main(int argc, char* argv[]) {
 
 	//set the file paths
-    std::string str1 = (std::string("../resource/").append(argv[1]));
-    std::string str2 = (std::string("../resource/").append(argv[2]));
-    std::string str3= (std::string("../resource/").append(argv[3]));
-    std::string str4= (std::string("../resource/").append(argv[4]));
-	const char* imaFilePath = str1.c_str();
-	const char* dtmFilePath = str2.c_str();
-	const char* dsmFilePath = str3.c_str();
-	const char* oesmFilePath = "../resource/OESM.tif";
-	const char* domFilePath = "../resource/DOM.tif";
-	const char* tagsFIlepath = str4.c_str();
-	const char* domCreatepath = "../resource/DOM.tif";
-	const char* oesmCreatepath = "../resource/OESM.tif";
+	const char* imaFilePath = argv[1];
+	const char* dtmFilePath = argv[2];
+	const char* dsmFilePath = argv[3];
+	const char* oesmFilePath = argv[5];
+	const char* domFilePath = argv[6];
+	const char* tagsFIlepath = argv[4];
+	const char* domCreatepath = argv[6];
+	const char* oesmCreatepath = argv[5];
 
 	//chaek the prameters 
-	if (argc != 6) {
+	if (argc != 8) {
 	
 		std::cout << "more or less  prameters" << std::endl;
         return 0;
 	}
-	float elevation_dsm_for_inservation = atof(argv[5]);
+	float elevation_dsm_for_inservation = atof(argv[7]);
 
 	//read the ima and tif with opencv
 	cv::Mat img = cv::imread(imaFilePath);
@@ -65,11 +61,14 @@ int main(int argc, char* argv[]) {
 	GDALAllRegister();  //注册所有的驱动
 	poDataset2 = (GDALDataset*)GDALOpen(oesmFilePath, GA_Update);
 	float* paf2 = new float[1];
-	for (int k = 0; k < p_rec_vec.size();k++) {
+    std::cout<<"vec_size: "<<p_rec_vec.size()<<std::endl<<std::endl;
+    
+	for (int k = 0; k <p_rec_vec.size() ;k++) {
 		GDAL_Method* dem_gdal = new GDAL_Method(dtmFilePath, p_rec_vec[k], trans_btw_tif_ima, ima_width, ima_height);
 		//std::cout << "End read the dem rasters..." << std::endl;
 		/********************************************Create DOM and write***************************************************************/
 
+        std::cout<<"progress: "<<k+1<<"/"<<p_rec_vec.size()<<std::endl;
 		if (poDataset == NULL)
 		{
 			std::cout << "fail in open files!!!" << std::endl;

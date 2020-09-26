@@ -38,8 +38,8 @@ GDAL_Method::GDAL_Method(const char* file_path_name, p_rect rect, Transform_btw_
 		int dx = i % rect->width + rect->begin_x;
 		int dy = i / rect->width + rect->begin_y;
 
-		float geo_X = _trans[0] + dx * _trans[1] + dy * _trans[2];
-		float geo_Y = _trans[3] + dx * _trans[4] + dy * _trans[5];
+		float geo_X = _trans[0] + (dx+0.5) * _trans[1] + (dy+0.5) * _trans[2];
+		float geo_Y = _trans[3] + (dx+0.5) * _trans[4] + (dy+0.5) * _trans[5];
 		float elevation = inBuf[i];
 
 		std::vector<int> tem_vec = trans_btw_tif_ima->get_Ima_xy_from_geoXYZ(geo_X, geo_Y, elevation, ima_width, ima_height,nine_pras);
@@ -94,16 +94,16 @@ GDAL_Method::GDAL_Method(const char* file_path_name, p_rect rect, Transform_btw_
  float GDAL_Method::get_Ima_geoXYZ_from_xy(GDALDataset* poDataset, float* inBuf,int x, int y, float max_elevation, int tif_width, int tif_height, double* nine_prameters,int ima_width,int ima_height) {
 
 
-	 x = x - ima_width / 2;
-	 y = -y + ima_height / 2;
+	 double double_x = x - double(ima_width) / 2;
+	 double double_y = -y + double(ima_height) / 2;
 
 	 double Xs = Transform_btw_Tif_Ima::getOutTags()->Xs;
 	 double Ys = Transform_btw_Tif_Ima::getOutTags()->Ys;
 	 double Zs = Transform_btw_Tif_Ima::getOutTags()->Zs;
 
-	 double temp1 = (nine_prameters[0] * (x - Transform_btw_Tif_Ima::getOutTags()->_x) + nine_prameters[1] * (y - Transform_btw_Tif_Ima::getOutTags()->_y) - nine_prameters[2] * Transform_btw_Tif_Ima::getOutTags()->_f);
-	 double temp2 = (nine_prameters[3] * (x - Transform_btw_Tif_Ima::getOutTags()->_x) + nine_prameters[4] * (y - Transform_btw_Tif_Ima::getOutTags()->_y) - nine_prameters[5] * Transform_btw_Tif_Ima::getOutTags()->_f);
-	 double temp3 = (nine_prameters[6] * (x - Transform_btw_Tif_Ima::getOutTags()->_x) + nine_prameters[7] * (y - Transform_btw_Tif_Ima::getOutTags()->_y) - nine_prameters[8] * Transform_btw_Tif_Ima::getOutTags()->_f);
+	 double temp1 = (nine_prameters[0] * (double_x - Transform_btw_Tif_Ima::getOutTags()->_x) + nine_prameters[1] * (double_y - Transform_btw_Tif_Ima::getOutTags()->_y) - nine_prameters[2] * Transform_btw_Tif_Ima::getOutTags()->_f);
+	 double temp2 = (nine_prameters[3] * (double_x - Transform_btw_Tif_Ima::getOutTags()->_x) + nine_prameters[4] * (double_y - Transform_btw_Tif_Ima::getOutTags()->_y) - nine_prameters[5] * Transform_btw_Tif_Ima::getOutTags()->_f);
+	 double temp3 = (nine_prameters[6] * (double_x - Transform_btw_Tif_Ima::getOutTags()->_x) + nine_prameters[7] * (double_y - Transform_btw_Tif_Ima::getOutTags()->_y) - nine_prameters[8] * Transform_btw_Tif_Ima::getOutTags()->_f);
 	 double Xgeo = (max_elevation - Zs) * temp1 / temp3 + Xs;
 	 double Ygeo = (max_elevation - Zs) * temp2 / temp3 + Ys;
 
@@ -126,7 +126,7 @@ GDAL_Method::GDAL_Method(const char* file_path_name, p_rect rect, Transform_btw_
 	 //迭代点刚好在DEM边界时 应该防止死循环
 	 //低点指高点 高点指低点 死循环 1 -> 0 -> 1
 	 int count = 0;
-	 while (fabs(elevetion - *inBuf) > 0.05 && count < 5000)
+	 while (fabs(elevetion - *inBuf) > 0.05 && count < 100)
 	 {
 		 elevetion = *inBuf;
 		 Xgeo = (elevetion - Zs) * temp1 / temp3 + Xs;

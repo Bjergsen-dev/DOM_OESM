@@ -34,14 +34,15 @@ std::vector<int> Transform_btw_Tif_Ima::get_Ima_xy_from_geoXYZ(float geo_X, floa
 	float temp1 = nine_prameters[0] * (geo_X - Xs) + nine_prameters[3] * (geo_Y - Ys) + nine_prameters[6] * (elevation - Zs);
 	float temp2 = nine_prameters[1] * (geo_X - Xs) + nine_prameters[4] * (geo_Y - Ys) + nine_prameters[7] * (elevation - Zs);
 	float temp3 = nine_prameters[2] * (geo_X - Xs) + nine_prameters[5] * (geo_Y - Ys) + nine_prameters[8] * (elevation - Zs);
-	int x = _outtags->_x - _outtags->_f * (temp1 / temp3);
-	int y = _outtags->_y - _outtags->_f * (temp2 / temp3);
+	double x = _outtags->_x - _outtags->_f * (temp1 / temp3);
+	double y = _outtags->_y - _outtags->_f * (temp2 / temp3);
 
 
 	//转换框标坐标为像素坐标
-	float ima_x = x + ima_width / 2;
-	float ima_y = -y + ima_height / 2;
+	double ima_x = x + ima_width / 2 + 0.5;
+	double ima_y = -y + ima_height / 2 + 0.5;
 
+    
 	std::vector<int> res;
 	res.push_back(ima_x);
 	res.push_back(ima_y);
